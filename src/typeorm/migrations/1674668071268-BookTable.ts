@@ -13,6 +13,10 @@ export class BookTable1674668071268 implements MigrationInterface {
                     isGenerated: true,
                     generationStrategy: 'uuid'
                 }, {
+                    name: 'title',
+                    type: 'varchar(150)',
+                    isNullable: false
+                }, {
                     name: 'publisher',
                     type: 'varchar(150)',
                     isNullable: false
@@ -22,6 +26,10 @@ export class BookTable1674668071268 implements MigrationInterface {
                     isNullable: false
                 }, {
                     name: 'numberOfPages',
+                    type: 'int',
+                    isNullable: false
+                }, {
+                    name: 'isbn',
                     type: 'int',
                     isNullable: false
                 }]

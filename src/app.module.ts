@@ -3,6 +3,8 @@ import {TypeOrmModule} from '@nestjs/typeorm';
 import {ConfigModule, ConfigService} from '@nestjs/config';
 import { migrations } from './typeorm/migrations';
 import { entites } from './typeorm/entities';
+import { BooksService } from './services/books/books.service';
+import { BooksController } from './controllers/books/books.controller';
 
 @Module({
   imports: [
@@ -27,9 +29,10 @@ import { entites } from './typeorm/entities';
           password: configService.get('DATABASE_PASSWORD'),
         }
       }
-    })
+    }),
+    TypeOrmModule.forFeature(entites)
   ],
-  controllers: [],
-  providers: [],
+  controllers: [BooksController],
+  providers: [BooksService],
 })
 export class AppModule {}
