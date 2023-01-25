@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import {TypeOrmModule} from '@nestjs/typeorm';
 import {ConfigService} from '@nestjs/config';
-import { async } from 'rxjs';
-import { entites } from './typeorm';
+import { entites } from './typeorm/entities';
+import { migrations } from './typeorm/migrations';
 
 @Module({
   imports: [
@@ -13,6 +13,10 @@ import { entites } from './typeorm';
           type: 'postgres',
           logging: true,
           entities: entites,
+          synchronize: false,
+          migrations: migrations,
+          migrationsTableName: 'migrations',
+          migrationsRun: true,
           host: configService.get('DATABASE_HOST'),
           port: configService.get('DATABASE_PORT'),
           username: configService.get('DATABASE_USER'),
