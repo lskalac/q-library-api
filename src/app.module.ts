@@ -1,11 +1,14 @@
 import { Module } from '@nestjs/common';
 import {TypeOrmModule} from '@nestjs/typeorm';
-import {ConfigService} from '@nestjs/config';
-import { entites } from './typeorm/entities';
+import {ConfigModule, ConfigService} from '@nestjs/config';
 import { migrations } from './typeorm/migrations';
+import { entites } from './typeorm/entities';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+			isGlobal: true,
+		}),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: async( configService: ConfigService) => {
