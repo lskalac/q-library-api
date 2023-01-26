@@ -3,8 +3,11 @@ import {
 	ClassSerializerInterceptor,
 	Controller,
 	Get,
+	InternalServerErrorException,
+	NotFoundException,
 	Param,
 	Post,
+	Put,
 	UseInterceptors,
 } from '@nestjs/common';
 import {CreateUserDto} from 'src/dtos/users/CreateUser.dto';
@@ -16,6 +19,7 @@ import {
 	ApiCreatedResponse,
 	ApiOkResponse,
 } from '@nestjs/swagger';
+import { UpdateUserDto } from 'src/dtos/users/UpdateUser.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -50,5 +54,23 @@ export class UsersController {
 	async create(@Body() user: CreateUserDto): Promise<UserDto> {
 		const result = await this.userService.create(user);
 		return new UserDto(result);
+	}
+
+    @ApiOkResponse({description: 'User successfully updated'})
+    @Put(':id')
+    async update(@Param('id') id: string, @Body() user: UpdateUserDto): Promise<void>{
+        await this.checkUserExistance(id);
+
+        const result = await this.userService.update(id, user);
+        if(!result)
+            throw new InternalServerErrorException();
+
+        return;
+    }
+
+    private async checkUserExistance(id: string): Promise<void> {
+		const existingBook = await this.userService.getById(id);
+		if (!existingBook)
+			throw new NotFoundException(`User with identifier ${id} not found`);
 	}
 }
