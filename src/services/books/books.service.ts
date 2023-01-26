@@ -25,4 +25,8 @@ export class BooksService {
     async update(id: string, book: CreateBookDto): Promise<boolean>{
         return (await this.bookRepository.update({id}, book)).affected === 1;
     }
+
+    async delete(id: string): Promise<boolean>{
+        return (await this.bookRepository.delete(id)).affected === 1;
+    }
 }
