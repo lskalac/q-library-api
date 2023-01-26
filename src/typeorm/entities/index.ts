@@ -1,9 +1,5 @@
-import { Book } from "./Book";
+import {Book} from './Book';
 
-export {
-    Book
-}
+export {Book};
 
-export const entites = [
-    Book
-];
+export const entites = [Book];
