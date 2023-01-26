@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
 import { BooksService } from 'src/services/books/books.service';
 import { Book } from 'src/typeorm/entities';
 import {ApiTags, ApiOkResponse} from '@nestjs/swagger';
@@ -27,6 +27,12 @@ export class BooksController {
     @ApiOkResponse({type: BookDto})
     create(@Body() book: CreateBookDto): Promise<Book>{
         return this.bookService.create(book);
+    }
+
+    @Put(':id')
+    @ApiOkResponse({type: BookDto})
+    update(@Param('id') id: string, book: CreateBookDto): Promise<boolean>{
+        return this.bookService.update(id, book);
     }
 }
  

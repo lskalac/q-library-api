@@ -21,4 +21,8 @@ export class BooksService {
         const entity = this.bookRepository.create(book);
         return this.bookRepository.save(entity);
     }
+
+    async update(id: string, book: CreateBookDto): Promise<boolean>{
+        return (await this.bookRepository.update({id}, book)).affected === 1;
+    }
 }
