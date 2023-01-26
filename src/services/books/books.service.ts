@@ -1,5 +1,6 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CreateBookDto } from 'src/dtos/books/CreateBook.dto';
 import { Book } from 'src/typeorm/entities';
 import { Repository } from 'typeorm';
 
@@ -14,5 +15,10 @@ export class BooksService {
 
     getById(id: string): Promise<Book>{
         return this.bookRepository.findOneBy({id});
+    }
+
+    create(book: CreateBookDto): Promise<Book>{
+        const entity = this.bookRepository.create(book);
+        return this.bookRepository.save(entity);
     }
 }

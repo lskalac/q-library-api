@@ -1,8 +1,9 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { BooksService } from 'src/services/books/books.service';
 import { Book } from 'src/typeorm/entities';
 import {ApiTags, ApiOkResponse} from '@nestjs/swagger';
-import { BookDto } from 'src/dtos/Book.dto';
+import { BookDto } from 'src/dtos/books/Book.dto';
+import { CreateBookDto } from 'src/dtos/books/CreateBook.dto';
 
 @ApiTags('books')
 @Controller('books')
@@ -21,4 +22,11 @@ export class BooksController {
     getById(@Param('id') id: string): Promise<Book>{
         return this.bookService.getById(id);
     }
+
+    @Post()
+    @ApiOkResponse({type: BookDto})
+    create(@Body() book: CreateBookDto): Promise<Book>{
+        return this.bookService.create(book);
+    }
 }
+ 
