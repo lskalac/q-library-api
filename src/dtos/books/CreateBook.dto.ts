@@ -1,4 +1,4 @@
-import { IsDate, IsInt, Length, MaxLength, Min } from 'class-validator';
+import { IsDate, IsDateString, IsInt, Max, MaxLength, Min } from 'class-validator';
 
 export class CreateBookDto {
     @MaxLength(150)
@@ -7,7 +7,7 @@ export class CreateBookDto {
     @MaxLength(150)
     publisher: string;
 
-    @IsDate()
+    @IsDateString()
     publishedDate: Date;
 
     @IsInt()
@@ -15,6 +15,7 @@ export class CreateBookDto {
     numberOfPages: number;
 
     @IsInt()
-    @Length(10)
+    @Min(1000000000)
+    @Max(9999999999)
     isbn: number;
 }

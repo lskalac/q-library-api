@@ -1,7 +1,7 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, InternalServerErrorException, Param, Post, Put } from '@nestjs/common';
 import { BooksService } from 'src/services/books/books.service';
 import { Book } from 'src/typeorm/entities';
-import {ApiTags, ApiOkResponse} from '@nestjs/swagger';
+import {ApiTags, ApiOkResponse, ApiCreatedResponse} from '@nestjs/swagger';
 import { BookDto } from 'src/dtos/books/Book.dto';
 import { CreateBookDto } from 'src/dtos/books/CreateBook.dto';
 
@@ -24,15 +24,18 @@ export class BooksController {
     }
 
     @Post()
-    @ApiOkResponse({type: BookDto})
+    @ApiCreatedResponse({type: BookDto})
     create(@Body() book: CreateBookDto): Promise<Book>{
         return this.bookService.create(book);
     }
 
     @Put(':id')
-    @ApiOkResponse({type: BookDto})
-    update(@Param('id') id: string, book: CreateBookDto): Promise<boolean>{
-        return this.bookService.update(id, book);
+    async update(@Param('id') id: string, @Body() book: CreateBookDto): Promise<void>{
+        const result = await this.bookService.update(id, book);
+        if(!result)
+            throw new InternalServerErrorException();
+        
+        return;
     }
 }
  
