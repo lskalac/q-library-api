@@ -1,10 +1,4 @@
-import {
-	IsDateString,
-	IsInt,
-	Max,
-	MaxLength,
-	Min,
-} from 'class-validator';
+import {IsDateString, IsInt, Max, MaxLength, Min} from 'class-validator';
 
 export class CreateBookDto {
 	@MaxLength(150)
