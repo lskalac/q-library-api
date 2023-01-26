@@ -1,6 +1,5 @@
 import { Body, Controller, Delete, Get, InternalServerErrorException, NotFoundException, Param, Post, Put } from '@nestjs/common';
 import { BooksService } from 'src/services/books/books.service';
-import { Book } from 'src/typeorm/entities';
 import {ApiTags, ApiOkResponse, ApiCreatedResponse, ApiNotFoundResponse} from '@nestjs/swagger';
 import { BookDto } from 'src/dtos/books/Book.dto';
 import { CreateBookDto } from 'src/dtos/books/CreateBook.dto';
