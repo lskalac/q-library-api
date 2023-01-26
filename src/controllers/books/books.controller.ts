@@ -1,7 +1,7 @@
-import { Body, Controller, Delete, Get, InternalServerErrorException, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, InternalServerErrorException, NotFoundException, Param, Post, Put } from '@nestjs/common';
 import { BooksService } from 'src/services/books/books.service';
 import { Book } from 'src/typeorm/entities';
-import {ApiTags, ApiOkResponse, ApiCreatedResponse} from '@nestjs/swagger';
+import {ApiTags, ApiOkResponse, ApiCreatedResponse, ApiNotFoundResponse} from '@nestjs/swagger';
 import { BookDto } from 'src/dtos/books/Book.dto';
 import { CreateBookDto } from 'src/dtos/books/CreateBook.dto';
 
@@ -31,7 +31,10 @@ export class BooksController {
 
     @Put(':id')
     @ApiOkResponse({description: 'Book sucessfully updated'})
+    @ApiNotFoundResponse({description: 'Requested book not found'})
     async update(@Param('id') id: string, @Body() book: CreateBookDto): Promise<void>{
+        await this.checkBookExistance(id);
+
         const result = await this.bookService.update(id, book);
         if(!result)
             throw new InternalServerErrorException();
@@ -41,12 +44,21 @@ export class BooksController {
 
     @Delete(':id')
     @ApiOkResponse({description: 'Book sucessfully deleted'})
+    @ApiNotFoundResponse({description: 'Requested book not found'})
     async delete(@Param('id') id: string): Promise<void>{
+        await this.checkBookExistance(id);
+
         const result = await this.bookService.delete(id);
         if(!result)
             throw new InternalServerErrorException();
 
         return;
+    }
+
+    private async checkBookExistance(id: string): Promise<void>{
+        const existingBook = await this.bookService.getById(id);
+        if(!existingBook)
+            throw new NotFoundException(`Book with identifier ${id} not found`);
     }
 }
  
