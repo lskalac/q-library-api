@@ -26,6 +26,9 @@ export class UserDto {
 	@ApiProperty()
 	role: UserRole;
 
+	@ApiProperty()
+	isActive: boolean;
+
 	constructor(partial: Partial<User>) {
 		Object.assign(this, partial);
 	}
