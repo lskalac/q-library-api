@@ -1,7 +1,7 @@
 import { Column, Entity } from "typeorm";
 import { BaseEntity } from "./BaseEntity";
 
-enum UserRole {
+export enum UserRole {
     ADMIN='admin',
     AUTHOR='author'
 }

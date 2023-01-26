@@ -14,7 +14,7 @@ export class BooksService {
 		return this.bookRepository.find();
 	}
 
-	getById(id: string): Promise<Book> {
+	getById(id: string): Promise<Book | null> {
 		return this.bookRepository.findOneBy({id});
 	}
 
