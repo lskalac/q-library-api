@@ -49,7 +49,7 @@ export class User extends BaseEntity {
 
 	@Column('boolean', {
 		nullable: false,
-		default: true
+		default: true,
 	})
 	isActive: boolean;
 }
