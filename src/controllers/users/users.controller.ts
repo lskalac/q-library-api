@@ -18,6 +18,7 @@ import {
 	ApiTags,
 	ApiCreatedResponse,
 	ApiOkResponse,
+	ApiNotFoundResponse,
 } from '@nestjs/swagger';
 import {UpdateUserDto} from 'src/dtos/users/UpdateUser.dto';
 
@@ -57,6 +58,7 @@ export class UsersController {
 	}
 
 	@ApiOkResponse({description: 'User successfully updated'})
+	@ApiNotFoundResponse({description: 'Requested user not found'})
 	@Put(':id')
 	async update(
 		@Param('id') id: string,
@@ -65,6 +67,18 @@ export class UsersController {
 		await this.checkUserExistance(id);
 
 		const result = await this.userService.update(id, user);
+		if (!result) throw new InternalServerErrorException();
+
+		return;
+	}
+
+	@ApiOkResponse({description: 'User successfully deactivated'})
+	@ApiNotFoundResponse({description: 'Requested user not found'})
+	@Put(':id/deactivate')
+	async deactivate(@Param('id') id: string): Promise<void> {
+		await this.checkUserExistance(id);
+
+		const result = await this.userService.updateActive(id, false);
 		if (!result) throw new InternalServerErrorException();
 
 		return;

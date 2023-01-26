@@ -46,4 +46,10 @@ export class User extends BaseEntity {
 		enum: UserRole,
 	})
 	role: UserRole;
+
+	@Column('boolean', {
+		nullable: false,
+		default: true,
+	})
+	isActive: boolean;
 }

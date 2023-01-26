@@ -39,4 +39,10 @@ export class UsersService {
 	async update(id: string, user: UpdateUserDto): Promise<boolean> {
 		return (await this.userRepository.update({id}, user)).affected === 1;
 	}
+
+	async updateActive(id: string, isActive: boolean): Promise<boolean> {
+		return (
+			(await this.userRepository.update({id}, {isActive})).affected === 1
+		);
+	}
 }
