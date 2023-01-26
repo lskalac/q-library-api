@@ -1,11 +1,16 @@
 import { Module } from '@nestjs/common';
 import {TypeOrmModule} from '@nestjs/typeorm';
-import {ConfigService} from '@nestjs/config';
-import { entites } from './typeorm/entities';
+import {ConfigModule, ConfigService} from '@nestjs/config';
 import { migrations } from './typeorm/migrations';
+import { entites } from './typeorm/entities';
+import { BooksService } from './services/books/books.service';
+import { BooksController } from './controllers/books/books.controller';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+			isGlobal: true,
+		}),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: async( configService: ConfigService) => {
@@ -24,9 +29,10 @@ import { migrations } from './typeorm/migrations';
           password: configService.get('DATABASE_PASSWORD'),
         }
       }
-    })
+    }),
+    TypeOrmModule.forFeature(entites)
   ],
-  controllers: [],
-  providers: [],
+  controllers: [BooksController],
+  providers: [BooksService],
 })
 export class AppModule {}
