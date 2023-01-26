@@ -1,7 +1,12 @@
 import {Column, Entity} from 'typeorm';
 import {BaseEntity} from './BaseEntity';
 
-@Entity()
+@Entity({
+	orderBy: {
+		title: 'ASC',
+		datePublished: 'DESC'
+	}
+})
 export class Book extends BaseEntity {
 	@Column('varchar', {
 		length: 150,
