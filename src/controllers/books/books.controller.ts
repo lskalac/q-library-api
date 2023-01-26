@@ -13,19 +13,19 @@ export class BooksController {
 
     @Get()
     @ApiOkResponse({ isArray: true, type: BookDto, description: 'Requested books'})
-    get(): Promise<Book[]>{
+    get(): Promise<BookDto[]>{
         return this.bookService.get();
     }
 
     @Get(':id')
     @ApiOkResponse({type: BookDto, description: 'Requested book'})
-    getById(@Param('id') id: string): Promise<Book>{
+    getById(@Param('id') id: string): Promise<BookDto>{
         return this.bookService.getById(id);
     }
 
     @Post()
     @ApiCreatedResponse({type: BookDto, description: 'Book successfully created'})
-    create(@Body() book: CreateBookDto): Promise<Book>{
+    create(@Body() book: CreateBookDto): Promise<BookDto>{
         return this.bookService.create(book);
     }
 
