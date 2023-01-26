@@ -5,6 +5,8 @@ import {migrations} from './typeorm/migrations';
 import {entites} from './typeorm/entities';
 import {BooksService} from './services/books/books.service';
 import {BooksController} from './controllers/books/books.controller';
+import { UsersController } from './controllers/users/users.controller';
+import { UsersService } from './services/users/users.service';
 
 @Module({
 	imports: [
@@ -32,7 +34,7 @@ import {BooksController} from './controllers/books/books.controller';
 		}),
 		TypeOrmModule.forFeature(entites),
 	],
-	controllers: [BooksController],
-	providers: [BooksService],
+	controllers: [BooksController, UsersController],
+	providers: [BooksService, UsersService],
 })
 export class AppModule {}
