@@ -1,8 +1,9 @@
-import {ConflictException, Injectable} from '@nestjs/common';
+import {ConflictException, Injectable, NotFoundException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {CreateUserDto} from 'src/dtos/users/CreateUser.dto';
 import {UpdateUserDto} from 'src/dtos/users/UpdateUser.dto';
 import {User} from 'src/typeorm/entities';
+import { UserRole } from 'src/typeorm/entities/User';
 import {hash} from 'src/utils/hash.util';
 import {Repository} from 'typeorm';
 
@@ -44,5 +45,16 @@ export class UsersService {
 		return (
 			(await this.userRepository.update({id}, {isActive})).affected === 1
 		);
+	}
+
+	async delete(id: string): Promise<boolean>{
+		const user = await this.getById(id);
+		if(!user)
+			throw new NotFoundException(`User with ${id} not found`);
+
+		if(user.role === UserRole.ADMIN && user.isActive)
+			throw new ConflictException('User is active admin');
+
+		return (await this.userRepository.delete(id)).affected === 1;
 	}
 }
