@@ -5,8 +5,8 @@ import {migrations} from './typeorm/migrations';
 import {entites} from './typeorm/entities';
 import {BooksService} from './services/books/books.service';
 import {BooksController} from './controllers/books/books.controller';
-import { UsersController } from './controllers/users/users.controller';
-import { UsersService } from './services/users/users.service';
+import {UsersController} from './controllers/users/users.controller';
+import {UsersService} from './services/users/users.service';
 
 @Module({
 	imports: [
