@@ -1,6 +1,7 @@
 import {ConflictException, Injectable} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {CreateUserDto} from 'src/dtos/users/CreateUser.dto';
+import {UpdateUserDto} from 'src/dtos/users/UpdateUser.dto';
 import {User} from 'src/typeorm/entities';
 import {hash} from 'src/utils/hash.util';
 import {Repository} from 'typeorm';
@@ -33,5 +34,9 @@ export class UsersService {
 		const passwordHash = await hash(user.password);
 		const entity = this.userRepository.create({...user, passwordHash});
 		return this.userRepository.save(entity);
+	}
+
+	async update(id: string, user: UpdateUserDto): Promise<boolean> {
+		return (await this.userRepository.update({id}, user)).affected === 1;
 	}
 }
