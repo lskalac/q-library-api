@@ -38,7 +38,7 @@ export class BooksController {
 	})
 	get(@Request() req): Promise<BookDto[]> {
 		const {user} = req;
-		const authorId = user.role === UserRole.ADMIN ? user.id : undefined;
+		const authorId = user.role === UserRole.AUTHOR ? user.id : undefined;
 		return this.bookService.get(authorId);
 	}
 
@@ -49,7 +49,11 @@ export class BooksController {
 	})
 	async getById(@Param('id') id: string, @Request() req): Promise<BookDto> {
 		const book = await this.bookService.getById(id);
+		if(!book)
+			return book;
+
 		await this.validateBookOwnership(req.user, book.authorId);
+
 		return book;
 	}
 
@@ -116,7 +120,7 @@ export class BooksController {
 		user: JwtSignPayload,
 		authorId: string
 	): void {
-		if (user.role !== UserRole.ADMIN || authorId !== user.id)
+		if (user.role !== UserRole.ADMIN && authorId !== user.id)
 			throw new ForbiddenException(
 				'User is not permitted for this action'
 			);

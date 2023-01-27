@@ -72,9 +72,10 @@ export class UsersController {
 	@Put(':id')
 	async update(
 		@Param('id') id: string,
-		@Body() user: UpdateUserDto
+		@Body() user: UpdateUserDto,
+		@Request() req
 	): Promise<void> {
-		await this.checkUserExistance(id);
+		await this.validateExistanceAndOwnership(id, req.user);
 
 		const result = await this.userService.update(id, user);
 		if (!result) throw new InternalServerErrorException();
@@ -89,8 +90,7 @@ export class UsersController {
 	})
 	@Put(':id/deactivate')
 	async deactivate(@Param('id') id: string, @Request() req): Promise<void> {
-		const user = await this.checkUserExistance(id);
-		this.validateAccountOwnership(req.user, user.id);
+		await this.validateExistanceAndOwnership(id, req.user);
 
 		const result = await this.userService.updateActive(id, false);
 		if (!result) throw new InternalServerErrorException();
@@ -122,9 +122,17 @@ export class UsersController {
 		user: JwtSignPayload,
 		accountId: string
 	): void {
-		if (user.role !== UserRole.ADMIN || accountId !== user.id)
+		if (user.role !== UserRole.ADMIN && accountId !== user.id)
 			throw new ForbiddenException(
 				'User is not permitted for this action'
 			);
+	}
+
+	private async validateExistanceAndOwnership(
+		id: string,
+		user: JwtSignPayload
+	): Promise<void> {
+		const acc = await this.checkUserExistance(id);
+		this.validateAccountOwnership(user, acc.id);
 	}
 }
