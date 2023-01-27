@@ -22,8 +22,8 @@ import {
 	ApiNotFoundResponse,
 } from '@nestjs/swagger';
 import {UpdateUserDto} from 'src/dtos/users/UpdateUser.dto';
-import { UserRole } from 'src/typeorm/entities/User';
-import { Roles } from 'src/decorators/role.decorator';
+import {UserRole} from 'src/typeorm/entities/User';
+import {Roles} from 'src/decorators/role.decorator';
 
 @ApiTags('users')
 @Controller('users')
