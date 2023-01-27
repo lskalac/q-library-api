@@ -4,9 +4,8 @@ import {BaseEntity} from './BaseEntity';
 
 @Entity({
 	orderBy: {
-		title: 'ASC',
-		datePublished: 'DESC',
-	},
+		title: 'ASC'
+	}
 })
 export class Book extends BaseEntity {
 	@Column('varchar', {
