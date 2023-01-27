@@ -23,6 +23,10 @@
 ## Where to find my api?
 * api url: http://localhost:7000
 * api docs: http://localhost:7000/docs
+
+## Default admin
+email: admin@admin.com <br />
+password: admin
  
 ### Author notes
 * all routes are authenticated (except auth/login) and 401 Exception can be thrown 
