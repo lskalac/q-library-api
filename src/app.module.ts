@@ -4,9 +4,17 @@ import {ConfigModule, ConfigService} from '@nestjs/config';
 import {migrations} from './typeorm/migrations';
 import {entites} from './typeorm/entities';
 import {BooksService} from './services/books/books.service';
-import {BooksController} from './controllers/books/books.controller';
 import {UsersController} from './controllers/users/users.controller';
 import {UsersService} from './services/users/users.service';
+import {AuthService} from './services/auth/auth.service';
+import {AuthController} from './controllers/auth/auth.controller';
+import {LocalStrategy} from './services/auth/local.strategy';
+import {PassportModule} from '@nestjs/passport';
+import {BooksController} from './controllers/books/books.controller';
+import {JwtModule} from '@nestjs/jwt';
+import {JwtStrategy} from './services/auth/jwt.strategy';
+import {APP_GUARD} from '@nestjs/core';
+import {JwtAuthGuard} from './services/auth/jwt.auth.guard';
 
 @Module({
 	imports: [
@@ -33,8 +41,31 @@ import {UsersService} from './services/users/users.service';
 			},
 		}),
 		TypeOrmModule.forFeature(entites),
+		PassportModule,
+		JwtModule.registerAsync({
+			inject: [ConfigService],
+			useFactory: async (configService: ConfigService) => {
+				return {
+					secret: configService.get('JWT_SECRET_KEY'),
+					signOptions: {
+						expiresIn: '1d',
+					},
+				};
+			},
+		}),
 	],
-	controllers: [BooksController, UsersController],
-	providers: [BooksService, UsersService],
+	controllers: [BooksController, UsersController, AuthController],
+	providers: [
+		BooksService,
+		UsersService,
+		AuthService,
+		LocalStrategy,
+		JwtStrategy,
+		{
+			// global auth guard for all endpoints
+			provide: APP_GUARD,
+			useClass: JwtAuthGuard,
+		},
+	],
 })
 export class AppModule {}
