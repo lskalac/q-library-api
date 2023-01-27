@@ -44,7 +44,9 @@ export class BooksController {
 
 	@Get(':id')
 	@ApiOkResponse({type: BookDto, description: 'Requested book'})
-	@ApiForbiddenResponse({description: 'User does not have permission for this action'})
+	@ApiForbiddenResponse({
+		description: 'User does not have permission for this action',
+	})
 	async getById(@Param('id') id: string, @Request() req): Promise<BookDto> {
 		const book = await this.bookService.getById(id);
 		await this.validateBookOwnership(req.user, book.authorId);
@@ -56,7 +58,9 @@ export class BooksController {
 		type: BookDto,
 		description: 'Book successfully created',
 	})
-	@ApiForbiddenResponse({description: 'User does not have permission for this action'})
+	@ApiForbiddenResponse({
+		description: 'User does not have permission for this action',
+	})
 	async create(
 		@Body() book: CreateBookDto,
 		@Request() req
@@ -69,7 +73,9 @@ export class BooksController {
 	@Put(':id')
 	@ApiOkResponse({description: 'Book sucessfully updated'})
 	@ApiNotFoundResponse({description: 'Requested book not found'})
-	@ApiForbiddenResponse({description: 'User does not have permission for this action'})
+	@ApiForbiddenResponse({
+		description: 'User does not have permission for this action',
+	})
 	async update(
 		@Param('id') id: string,
 		@Body() book: CreateBookDto,
@@ -86,7 +92,9 @@ export class BooksController {
 	@Delete(':id')
 	@ApiOkResponse({description: 'Book sucessfully deleted'})
 	@ApiNotFoundResponse({description: 'Requested book not found'})
-	@ApiForbiddenResponse({description: 'User does not have permission for this action'})
+	@ApiForbiddenResponse({
+		description: 'User is not permitted for this action',
+	})
 	async delete(@Param('id') id: string, @Request() req): Promise<void> {
 		await this.validateExistanceAndOwnership(id, req.user);
 
@@ -104,12 +112,14 @@ export class BooksController {
 		return existingBook;
 	}
 
-	private async validateBookOwnership(
+	private validateBookOwnership(
 		user: JwtSignPayload,
 		authorId: string
-	): Promise<void> {
+	): void {
 		if (user.role !== UserRole.ADMIN || authorId !== user.id)
-			throw new ForbiddenException();
+			throw new ForbiddenException(
+				'User is not permitted for this action'
+			);
 	}
 
 	private async validateExistanceAndOwnership(
