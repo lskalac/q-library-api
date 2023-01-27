@@ -7,6 +7,10 @@ import {BooksService} from './services/books/books.service';
 import {BooksController} from './controllers/books/books.controller';
 import {UsersController} from './controllers/users/users.controller';
 import {UsersService} from './services/users/users.service';
+import { AuthService } from './services/auth/auth.service';
+import { AuthController } from './controllers/auth/auth.controller';
+import { LocalStrategy } from './services/auth/local.strategy';
+import {PassportModule} from '@nestjs/passport';
 
 @Module({
 	imports: [
@@ -33,8 +37,9 @@ import {UsersService} from './services/users/users.service';
 			},
 		}),
 		TypeOrmModule.forFeature(entites),
+		PassportModule
 	],
-	controllers: [BooksController, UsersController],
-	providers: [BooksService, UsersService],
+	controllers: [BooksController, UsersController, AuthController],
+	providers: [BooksService, UsersService, AuthService, LocalStrategy],
 })
 export class AppModule {}
