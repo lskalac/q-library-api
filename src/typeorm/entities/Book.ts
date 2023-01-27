@@ -1,5 +1,5 @@
 import {Column, Entity, ManyToOne} from 'typeorm';
-import { User } from '.';
+import {User} from '.';
 import {BaseEntity} from './BaseEntity';
 
 @Entity({
@@ -33,12 +33,12 @@ export class Book extends BaseEntity {
 
 	@Column('int', {
 		nullable: false,
-		unique: true
+		unique: true,
 	})
 	isbn: number;
 
 	@Column('uuid', {
-		nullable: false
+		nullable: false,
 	})
 	authorId: string;
 

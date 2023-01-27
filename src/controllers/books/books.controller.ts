@@ -2,12 +2,14 @@ import {
 	Body,
 	Controller,
 	Delete,
+	ForbiddenException,
 	Get,
 	InternalServerErrorException,
 	NotFoundException,
 	Param,
 	Post,
 	Put,
+	Request,
 } from '@nestjs/common';
 import {BooksService} from 'src/services/books/books.service';
 import {
@@ -18,6 +20,9 @@ import {
 } from '@nestjs/swagger';
 import {BookDto} from 'src/dtos/books/Book.dto';
 import {CreateBookDto} from 'src/dtos/books/CreateBook.dto';
+import {UserRole} from 'src/typeorm/entities/User';
+import {JwtSignPayload} from 'src/dtos/auth/LoginPayload.dto';
+import {Book} from 'src/typeorm/entities';
 
 @ApiTags('books')
 @Controller('books')
@@ -30,14 +35,18 @@ export class BooksController {
 		type: BookDto,
 		description: 'Requested books',
 	})
-	get(): Promise<BookDto[]> {
-		return this.bookService.get();
+	get(@Request() req): Promise<BookDto[]> {
+		const {user} = req;
+		const authorId = user.role === UserRole.ADMIN ? user.id : undefined;
+		return this.bookService.get(authorId);
 	}
 
 	@Get(':id')
 	@ApiOkResponse({type: BookDto, description: 'Requested book'})
-	getById(@Param('id') id: string): Promise<BookDto> {
-		return this.bookService.getById(id);
+	async getById(@Param('id') id: string, @Request() req): Promise<BookDto> {
+		const book = await this.bookService.getById(id);
+		await this.validateBookOwnership(req.user, book.authorId);
+		return book;
 	}
 
 	@Post()
@@ -45,7 +54,12 @@ export class BooksController {
 		type: BookDto,
 		description: 'Book successfully created',
 	})
-	create(@Body() book: CreateBookDto): Promise<BookDto> {
+	async create(
+		@Body() book: CreateBookDto,
+		@Request() req
+	): Promise<BookDto> {
+		await this.validateBookOwnership(req.user, book.authorId);
+
 		return this.bookService.create(book);
 	}
 
@@ -54,9 +68,10 @@ export class BooksController {
 	@ApiNotFoundResponse({description: 'Requested book not found'})
 	async update(
 		@Param('id') id: string,
-		@Body() book: CreateBookDto
+		@Body() book: CreateBookDto,
+		@Request() req
 	): Promise<void> {
-		await this.checkBookExistance(id);
+		await this.validateExistanceAndOwnership(id, req.user);
 
 		const result = await this.bookService.update(id, book);
 		if (!result) throw new InternalServerErrorException();
@@ -67,8 +82,8 @@ export class BooksController {
 	@Delete(':id')
 	@ApiOkResponse({description: 'Book sucessfully deleted'})
 	@ApiNotFoundResponse({description: 'Requested book not found'})
-	async delete(@Param('id') id: string): Promise<void> {
-		await this.checkBookExistance(id);
+	async delete(@Param('id') id: string, @Request() req): Promise<void> {
+		await this.validateExistanceAndOwnership(id, req.user);
 
 		const result = await this.bookService.delete(id);
 		if (!result) throw new InternalServerErrorException();
@@ -76,9 +91,27 @@ export class BooksController {
 		return;
 	}
 
-	private async checkBookExistance(id: string): Promise<void> {
+	private async checkBookExistance(id: string): Promise<Book> {
 		const existingBook = await this.bookService.getById(id);
 		if (!existingBook)
 			throw new NotFoundException(`Book with identifier ${id} not found`);
+
+		return existingBook;
+	}
+
+	private async validateBookOwnership(
+		user: JwtSignPayload,
+		authorId: string
+	): Promise<void> {
+		if (user.role !== UserRole.ADMIN || authorId !== user.id)
+			throw new ForbiddenException();
+	}
+
+	private async validateExistanceAndOwnership(
+		id: string,
+		user: JwtSignPayload
+	): Promise<void> {
+		const book = await this.checkBookExistance(id);
+		this.validateBookOwnership(user, book.authorId);
 	}
 }
