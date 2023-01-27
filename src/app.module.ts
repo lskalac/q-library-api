@@ -12,6 +12,9 @@ import {LocalStrategy} from './services/auth/local.strategy';
 import {PassportModule} from '@nestjs/passport';
 import {BooksController} from './controllers/books/books.controller';
 import {JwtModule} from '@nestjs/jwt';
+import {JwtStrategy} from './services/auth/jwt.strategy';
+import {APP_GUARD} from '@nestjs/core';
+import {JwtAuthGuard} from './services/auth/jwt.auth.guard';
 
 @Module({
 	imports: [
@@ -52,6 +55,17 @@ import {JwtModule} from '@nestjs/jwt';
 		}),
 	],
 	controllers: [BooksController, UsersController, AuthController],
-	providers: [BooksService, UsersService, AuthService, LocalStrategy],
+	providers: [
+		BooksService,
+		UsersService,
+		AuthService,
+		LocalStrategy,
+		JwtStrategy,
+		{
+			// global auth guard for all endpoints
+			provide: APP_GUARD,
+			useClass: JwtAuthGuard,
+		},
+	],
 })
 export class AppModule {}
