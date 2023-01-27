@@ -2,6 +2,7 @@ import {
 	Body,
 	ClassSerializerInterceptor,
 	Controller,
+	Delete,
 	Get,
 	InternalServerErrorException,
 	NotFoundException,
@@ -84,9 +85,20 @@ export class UsersController {
 		return;
 	}
 
+	@ApiOkResponse({description: 'User successfully deleted'})
+	@ApiNotFoundResponse({description: 'Requested user not found'})
+	@ApiConflictResponse({description: 'Requested user can not be deleted'})
+	@Delete(':id')
+	async delete(@Param('id') id: string): Promise<void> {
+		const result = await this.userService.delete(id);
+		if (!result) throw new InternalServerErrorException();
+
+		return;
+	}
+
 	private async checkUserExistance(id: string): Promise<void> {
-		const existingBook = await this.userService.getById(id);
-		if (!existingBook)
+		const existingUser = await this.userService.getById(id);
+		if (!existingUser)
 			throw new NotFoundException(`User with identifier ${id} not found`);
 	}
 }
