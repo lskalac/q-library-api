@@ -1,4 +1,9 @@
-import {ConflictException, Injectable, NotFoundException} from '@nestjs/common';
+import {
+	ConflictException,
+	Injectable,
+	NotFoundException,
+	OnModuleInit,
+} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {CreateUserDto} from 'src/dtos/users/CreateUser.dto';
 import {UpdateUserDto} from 'src/dtos/users/UpdateUser.dto';
@@ -8,10 +13,26 @@ import {hash} from 'src/utils/hash.util';
 import {Repository} from 'typeorm';
 
 @Injectable()
-export class UsersService {
+export class UsersService implements OnModuleInit {
 	constructor(
 		@InjectRepository(User) private userRepository: Repository<User>
 	) {}
+
+	async onModuleInit() {
+		const defaultAdmin: CreateUserDto = {
+			email: 'admin@admin.com',
+			firstName: 'admin',
+			lastName: 'admin',
+			role: UserRole.ADMIN,
+			password: 'admin',
+			confirmPassword: 'admin',
+			phone: '009922',
+		};
+		const existingUser = await this.getByEmail(defaultAdmin.email);
+		if (!existingUser) {
+			this.create(defaultAdmin);
+		}
+	}
 
 	get(): Promise<User[]> {
 		return this.userRepository.find();

@@ -49,8 +49,7 @@ export class BooksController {
 	})
 	async getById(@Param('id') id: string, @Request() req): Promise<BookDto> {
 		const book = await this.bookService.getById(id);
-		if(!book)
-			return book;
+		if (!book) return book;
 
 		await this.validateBookOwnership(req.user, book.authorId);
 
