@@ -22,12 +22,15 @@ import {
 	ApiNotFoundResponse,
 } from '@nestjs/swagger';
 import {UpdateUserDto} from 'src/dtos/users/UpdateUser.dto';
+import { UserRole } from 'src/typeorm/entities/User';
+import { Roles } from 'src/decorators/role.decorator';
 
 @ApiTags('users')
 @Controller('users')
 export class UsersController {
 	constructor(private userService: UsersService) {}
 
+	@Roles(UserRole.ADMIN)
 	@ApiOkResponse({
 		description: 'Requested users',
 		type: UserDto,
@@ -39,6 +42,7 @@ export class UsersController {
 		return result.map((x) => new UserDto(x));
 	}
 
+	@Roles(UserRole.ADMIN)
 	@ApiOkResponse({description: 'Requested user', type: UserDto})
 	@Get(':id')
 	async getById(@Param('id') id: string): Promise<UserDto | null> {
@@ -46,6 +50,7 @@ export class UsersController {
 		return result ? new UserDto(result) : result;
 	}
 
+	@Roles(UserRole.ADMIN)
 	@UseInterceptors(ClassSerializerInterceptor)
 	@ApiCreatedResponse({
 		description: 'User successfully created',
@@ -85,6 +90,7 @@ export class UsersController {
 		return;
 	}
 
+	@Roles(UserRole.ADMIN)
 	@ApiOkResponse({description: 'User successfully deleted'})
 	@ApiNotFoundResponse({description: 'Requested user not found'})
 	@ApiConflictResponse({description: 'Requested user can not be deleted'})
