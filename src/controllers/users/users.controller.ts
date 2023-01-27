@@ -89,7 +89,7 @@ export class UsersController {
 	@ApiNotFoundResponse({description: 'Requested user not found'})
 	@ApiConflictResponse({description: 'Requested user can not be deleted'})
 	@Delete(':id')
-	async delete(@Param('id') id: string): Promise<void>{
+	async delete(@Param('id') id: string): Promise<void> {
 		const result = await this.userService.delete(id);
 		if (!result) throw new InternalServerErrorException();
 
