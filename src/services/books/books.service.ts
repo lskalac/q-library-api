@@ -10,8 +10,8 @@ export class BooksService {
 		@InjectRepository(Book) private bookRepository: Repository<Book>
 	) {}
 
-	get(): Promise<Book[]> {
-		return this.bookRepository.find();
+	get(userId?: string): Promise<Book[]> {
+		return this.bookRepository.find({where: {authorId: userId}});
 	}
 
 	getById(id: string): Promise<Book | null> {
