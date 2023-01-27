@@ -4,13 +4,14 @@ import {ConfigModule, ConfigService} from '@nestjs/config';
 import {migrations} from './typeorm/migrations';
 import {entites} from './typeorm/entities';
 import {BooksService} from './services/books/books.service';
-import {BooksController} from './controllers/books/books.controller';
 import {UsersController} from './controllers/users/users.controller';
 import {UsersService} from './services/users/users.service';
-import { AuthService } from './services/auth/auth.service';
-import { AuthController } from './controllers/auth/auth.controller';
-import { LocalStrategy } from './services/auth/local.strategy';
+import {AuthService} from './services/auth/auth.service';
+import {AuthController} from './controllers/auth/auth.controller';
+import {LocalStrategy} from './services/auth/local.strategy';
 import {PassportModule} from '@nestjs/passport';
+import {BooksController} from './controllers/books/books.controller';
+import {JwtModule} from '@nestjs/jwt';
 
 @Module({
 	imports: [
@@ -37,7 +38,18 @@ import {PassportModule} from '@nestjs/passport';
 			},
 		}),
 		TypeOrmModule.forFeature(entites),
-		PassportModule
+		PassportModule,
+		JwtModule.registerAsync({
+			inject: [ConfigService],
+			useFactory: async (configService: ConfigService) => {
+				return {
+					secret: configService.get('JWT_SECRET_KEY'),
+					signOptions: {
+						expiresIn: '1d',
+					},
+				};
+			},
+		}),
 	],
 	controllers: [BooksController, UsersController, AuthController],
 	providers: [BooksService, UsersService, AuthService, LocalStrategy],
