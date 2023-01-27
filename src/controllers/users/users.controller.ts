@@ -3,6 +3,7 @@ import {
 	ClassSerializerInterceptor,
 	Controller,
 	Delete,
+	ForbiddenException,
 	Get,
 	InternalServerErrorException,
 	NotFoundException,
@@ -10,6 +11,7 @@ import {
 	Post,
 	Put,
 	UseInterceptors,
+	Request,
 } from '@nestjs/common';
 import {CreateUserDto} from 'src/dtos/users/CreateUser.dto';
 import {UserDto} from 'src/dtos/users/User.dto';
@@ -20,10 +22,12 @@ import {
 	ApiCreatedResponse,
 	ApiOkResponse,
 	ApiNotFoundResponse,
+	ApiForbiddenResponse,
 } from '@nestjs/swagger';
 import {UpdateUserDto} from 'src/dtos/users/UpdateUser.dto';
-import {UserRole} from 'src/typeorm/entities/User';
+import {User, UserRole} from 'src/typeorm/entities/User';
 import {Roles} from 'src/decorators/role.decorator';
+import {JwtSignPayload} from 'src/dtos/auth/LoginPayload.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -80,9 +84,13 @@ export class UsersController {
 
 	@ApiOkResponse({description: 'User successfully deactivated'})
 	@ApiNotFoundResponse({description: 'Requested user not found'})
+	@ApiForbiddenResponse({
+		description: 'User is not permitted for this action',
+	})
 	@Put(':id/deactivate')
-	async deactivate(@Param('id') id: string): Promise<void> {
-		await this.checkUserExistance(id);
+	async deactivate(@Param('id') id: string, @Request() req): Promise<void> {
+		const user = await this.checkUserExistance(id);
+		this.validateAccountOwnership(req.user, user.id);
 
 		const result = await this.userService.updateActive(id, false);
 		if (!result) throw new InternalServerErrorException();
@@ -102,9 +110,21 @@ export class UsersController {
 		return;
 	}
 
-	private async checkUserExistance(id: string): Promise<void> {
+	private async checkUserExistance(id: string): Promise<User> {
 		const existingUser = await this.userService.getById(id);
 		if (!existingUser)
 			throw new NotFoundException(`User with identifier ${id} not found`);
+
+		return existingUser;
+	}
+
+	private validateAccountOwnership(
+		user: JwtSignPayload,
+		accountId: string
+	): void {
+		if (user.role !== UserRole.ADMIN || accountId !== user.id)
+			throw new ForbiddenException(
+				'User is not permitted for this action'
+			);
 	}
 }
