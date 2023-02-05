@@ -31,3 +31,4 @@ password: admin
  
 ### Author notes
 * all routes are authenticated (except auth/login) and 401 Exception can be thrown 
+* tests are only written for books.controllers.ts
