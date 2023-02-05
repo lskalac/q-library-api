@@ -19,6 +19,7 @@
   ```
   and populate values
   * execute command ```yarn start:dev```
+  * execute command ```yarn test``` to start tests
    
 ## Where to find my api?
 * api url: http://localhost:7000
