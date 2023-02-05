@@ -42,5 +42,5 @@ export class Book extends BaseEntity {
 	authorId: string;
 
 	@ManyToOne(() => User)
-	author: User;
+	author?: User;
 }
